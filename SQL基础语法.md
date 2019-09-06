@@ -68,7 +68,7 @@ alter table table_name add unique key [index_name]  (col_name,....);
 alter table table_name add index [index_name] (col_name,....);
 
 alter table table_name drop primary key ;
-alter table table_name drop index_name ;
+alter table table_name drop key index_name ;
 
 alter table  t4 add foreign key (zid) references t3 (zid);
 添加外键，字段类型需要一样，mysql中尽量少用外键 
