@@ -81,12 +81,15 @@ FROM employees;
 
 
 2. case (等值判断)
-   when 常量1 then 要显示的值1或语句1
-   when 常量2 then 要显示的值1或语句2
-   when 常量3 then 要显示的值1或语句3
-   ...
-   else 要显示的值n或语句n
-   end
+语法：
+		case 变量|表达式|字段
+		when 要判断的值 then 返回的值1
+		when 要判断的值 then 返回的值2
+		...
+		else 返回的值n
+		end
+		注意：update中使用case，else最好带上(变量|表达式|字段)，不然全部更新，需要特别注意
+		
 案例：查询员工的工资，要求
 			部门编号=30，显示的工资为1.1倍
 			部门编号=40，显示的工资为1.2倍
@@ -102,11 +105,15 @@ END AS new_salary
 FROM employees ORDER BY department_id;
 
 3. case (条件判断)
-   when 条件1 then 要显示的值1或语句1
-   when 条件2 then 要显示的值2或语句2
-	 when 条件3 then 要显示的值3或语句3
-	 else 要显示的值n或语句n
-	 end
+语法：
+		case 
+		when 要判断的条件1 then 返回的值1
+		when 要判断的条件2 then 返回的值2
+		...
+		else 返回的值n
+		end
+		注意：update中使用case，else最好带上(变量|表达式|字段)，不然全部更新，需要特别注意
+		
 案例：查询员工的工资的情况
 如果工资>20000,显示A级别
 如果工资>15000,显示B级别
