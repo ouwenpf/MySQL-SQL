@@ -23,6 +23,84 @@ create table tb_name select *  from old_tb_name 包括旧表的结构+数据
 ERROR 1786 (HY000): CREATE TABLE ... SELECT is forbidden when @@GLOBAL.ENFORCE_GTID_CONSISTENCY = 1 在gtid环境中不支持此语法
 
 
+create table test
+ (
+ ID int not null COMMENT 'ID值',
+ Name varchar(20) not null COMMENT '姓名',
+ Age varchar(20) not null COMMENT '年龄',
+ Sex varchar(20) not null COMMENT '性别',
+ Vocation varchar(20) not null COMMENT '职业',
+ CardID bigint not null COMMENT '身份ID信息',
+ Joindate datetime not null COMMENT '加入日期',
+ Region varchar(12) not null COMMENT '地区',
+ Tel varchar(12) not null COMMENT '移动电话号码',
+ Email varchar(30) not null COMMENT '电子邮箱',
+ Recommend varchar(10) COMMENT '推荐信息',
+ Identifier varchar(100) COMMENT '身份识别信息'
+ 
+ ) ;
+ 
+
+-- 改表名
+
+RENAME TABLE test  TO test1;
+ALTER TABLE  test RENAME  TO test1  ;
+
+ANALYZE TABLE 适用于 更新索引的统计信息，优化查询，但它不会影响表的物理结构。
+ALTER TABLE test  ENGINE = 'InnoDB' 来替换
+OPTIMIZE TABLE 
+适用于 回收空间 和 整理碎片，通过重新构建表和索引来优化存储。
+在实际使用中，通常建议定期使用 ANALYZE TABLE 来保持查询优化器的准确性，而 OPTIMIZE TABLE 主要在 大量删除或更新数据之后，或者表空间使用不合理时使用。
+1.OPTIMIZE TABLE只对MVISAM，BDB和InnoDB表起作用，尤其是MyISAM表的作用最为明显。然而并不是所有表都需要进行碎片整理，一般只需要对包含变长的文本数据类型(varchar)的表进行碎片整理。
+2.在OPTIMIZE TABLE运行过程中，MySQL会锁定表,
+3.默认情况下，直接对InnoDB引擎的数据表使用OPTIMIZE TABLE，可能会显示[Table does notsupport optimize, doing recreate+analyze instead」的提示信息。需要在mysqld启动mysql的时候加---skip-new或--safe-mode
+
+-- 新增列
+
+ALTER TABLE test  ADD  COLUMN   `Address`  VARCHAR(32) ;
+ALTER TABLE test  ADD COLUMN (`Address1` VARCHAR(32)  , `Address2` VARCHAR(32) ) ;
+
+
+--修改列名称
+ALTER TABLE test CHANGE COLUMN `Address1`   `Address3`  VARCHAR(32);
+
+
+--修改列属性
+ALTER TABLE test MODIFY COLUMN     `Address3`  VARCHAR(64);
+
+
+-- 增加和删除默认值
+
+ALTER TABLE test  ALTER COLUMN  `Address3`  SET DEFAULT '北京';
+
+-- 删除
+ALTER TABLE test  DROP COLUMN `Address1`;
+ALTER TABLE test  DROP COLUMN `Address2`;
+ALTER TABLE test  DROP COLUMN `Address3`;
+
+
+
+-- 添加/删除约束
+ALTER TABLE test  ADD PRIMARY KEY (`ID`)  ;
+
+ALTER TABLE test ADD UNIQUE KEY|INDEX [index_name] (`CardID`)  ;
+ALTER TABLE test ADD CONSTRAINT [index_name]  UNIQUE (`CardID`)  ;  --pg语法
+
+ALTER TABLE test ADD KEY|INDEX [index_name] (`Tel`)  ;
+create index [index_name]  on   test  (`Tel`)  ;   --pg语法
+
+ALTER TABLE test DROP PRIMARY KEY ;
+
+ALTER TABLE test DROP KEY `CardID` ;
+ALTER TABLE test DROP CONSTRAINT `CardID` ; --pg语法
+
+ALTER TABLE test DROP KEY `Tel` ;
+DROP INDEXdex  `Tel` ;  --pg语法
+
+
+
+
+
 
 1.修改表名称
 rename table old_table_name  to new_table_name;
@@ -35,7 +113,7 @@ ALTER TABLE table_name  CONVERT TO CHARACTER SET utf8 collate utf8_general_ci;
 会修改table_name的默认字符集和排序集，也会修改表中已有记录的字符集和排序集
 
 3.新增列
-ALTER TABLE table_name ADD column_name VARCHAR(50) NOT NULL DEFAULT '北京'  [FIRST|AFTER col_name];
+ALTER TABLE table_name ADD column_name VARCHAR(50) NOT NULL DEFAULT '北京'  [AFTER col_name];
 ALTER TABLE table_name ADD (number1 BIGINT,number2 BIGINT);新增多列
 注意：默认新增列是追加，可以使用first新增在第一列，也可以使用after 
 5
@@ -44,13 +122,13 @@ ALTER TABLE table_name drop column_name;删除列不能同时删除多个
 
 5. 修改列
 change修改列名称
-CHANGE [COLUMN] old_col_name new_col_name column_definition MODIFY [COLUMN] col_name column_definition [FIRST|AFTER col_name]
+CHANGE [COLUMN] old_col_name new_col_name column_definition MODIFY [COLUMN] col_name column_definition [AFTER col_name]
 ALTER TABLE table_name CHANGE  old_col_name new_col_name VARCHAR(50) NOT NULL DEFAULT '北京' COMMENT '地址';
 修改列表需要原来列表的属性，否则无法修改可以使用show create table 查询一下表结构
 
 6. 修改列属性
 modify修改列属性
-ALTER [COLUMN] col_name {SET DEFAULT literal | DROP DEFAULT} [FIRST | AFTER col_name]
+ALTER [COLUMN] col_name {SET DEFAULT literal | DROP DEFAULT} [ AFTER col_name]
 ALTER TABLE table_name modify col_name VARCHAR(50) NOT NULL DEFAULT '北京' COMMENT '地址' AFTER age;
 change可以通用，modify不能修改字段名称，相对起来modify使用起来更加的简单
 
@@ -65,7 +143,7 @@ ALTER TABLE test ALTER addr1 DROP DEFAULT;
 ```
 alter table table_name add primary key (col_name,....);
 alter table table_name add unique key [index_name]  (col_name,....);
-alter table table_name add index [index_name] (col_name,....);
+alter table table_name add key [index_name] (col_name,....);
 
 alter table table_name drop primary key ;
 alter table table_name drop key index_name ;

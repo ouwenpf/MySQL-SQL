@@ -66,9 +66,11 @@ date_add(now(),interval 1 year|month|day);
 unix_timestamp(now());linux时间戳
 datediff(now(),'2016-08-30 00:00:00');
 str_to_date：将日期格式字符转换成指定的日期格式
-					str_to_date('8-10-2019','%m-%d-%Y')返回：2019-08-10
+					str_to_date('8-10-2019','%m-%d-%Y'); 返回：2019-08-10
+					select str_to_date('2019-08-10','%Y-%m-%d'); 返回：2019-08-10 
 date_format：将日期转换成字符
 					date_format(now(),'%Y年%m月%d日')返回：2019年08月10日 
+					select date_format(DATE_ADD(NOW(), INTERVAL 2 DAY), '%Y-%m-%d %T');
 ```
 
 ### 流程控制函数
